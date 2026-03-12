@@ -16,10 +16,10 @@ A kubernetes demo projec to showcase Kubernetes, containerization, and platform 
 ## Roadmap
 
 [x] Initialize repository
-[ ] Backend service
-[ ] Frontend service
+[x] Backend service
 [ ] PostgreSQL setup
 [ ] Docker Compose local environment
+[ ] Frontend service
 [ ] Kubernetes manifests
 [ ] Local cluster with KIND
 [ ] Ingress controller
