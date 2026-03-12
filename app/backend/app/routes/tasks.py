@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.schemas.task import Task, CreateTaskRequest
-from app.storage.memory import create_task, list_tasks
+from app.storage.postgres import create_task, list_tasks
 
 router = APIRouter()
 
