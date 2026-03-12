@@ -1,0 +1,31 @@
+# K8s Demo 
+
+A kubernetes demo projec to showcase Kubernetes, containerization, and platform engineering skills.
+
+## Planned Stack
+- Frontend: Next.js
+- Backend: FastAPI
+- Database: PostgreSQL
+- Local Kubernetes: KIND
+- Packaging: Helm
+- GitOps: Argo CD
+- Monitoring: Prometheus + Grafana
+- CI: GitHub Actions
+- Cloud Deployment: AKS/EKS
+
+## Roadmap
+
+[ ] Initialize repository
+[ ] Backend service
+[ ] Frontend service
+[ ] PostgreSQL setup
+[ ] Docker Compose local environment
+[ ] Kubernetes manifests
+[ ] Local cluster with KIND
+[ ] Ingress controller
+[ ] Helm chart
+[ ] GitOps with Argo CD
+[ ] Monitoring stack
+[ ] CI pipeline
+[ ] Deploy to AKS or EKS
+[ ] Optional: Terraform infrastructure
