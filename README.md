@@ -18,7 +18,7 @@ A kubernetes demo projec to showcase Kubernetes, containerization, and platform 
 [x] Initialize repository
 [x] Backend service
 [ ] PostgreSQL setup
-[ ] Docker Compose local environment
+[x] Docker Compose local environment
 [ ] Frontend service
 [ ] Kubernetes manifests
 [ ] Local cluster with KIND
@@ -29,3 +29,9 @@ A kubernetes demo projec to showcase Kubernetes, containerization, and platform 
 [ ] CI pipeline
 [ ] Deploy to AKS or EKS
 [ ] Optional: Terraform infrastructure
+
+## Run locally with Docker Compose
+
+```bash
+docker compose up --build -d
+```

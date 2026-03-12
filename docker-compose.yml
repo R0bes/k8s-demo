@@ -1,0 +1,8 @@
+services:
+  backend:
+    image: k8s-demo-backend
+    build:
+      context: ./app/backend
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
