@@ -15,7 +15,7 @@ A kubernetes demo projec to showcase Kubernetes, containerization, and platform 
 
 ## Roadmap
 
-[ ] Initialize repository
+[x] Initialize repository
 [ ] Backend service
 [ ] Frontend service
 [ ] PostgreSQL setup
