@@ -15,20 +15,20 @@ A kubernetes demo projec to showcase Kubernetes, containerization, and platform 
 
 ## Roadmap
 
-[x] Initialize repository
-[x] Backend service
-[x] PostgreSQL setup
-[x] Docker Compose local environment
-[x] Frontend service
-[ ] Kubernetes manifests
-[ ] Local cluster with KIND
-[ ] Ingress controller
-[ ] Helm chart
-[ ] GitOps with Argo CD
-[ ] Monitoring stack
-[ ] CI pipeline
-[ ] Deploy to AKS or EKS
-[ ] Optional: Terraform infrastructure
+- [x] Initialize repository
+- [x] Backend service
+- [x] PostgreSQL setup
+- [x] Docker Compose local environment
+- [x] Frontend service
+- [ ] Kubernetes manifests
+- [ ] Local cluster with KIND
+- [ ] Ingress controller
+- [ ] Helm chart
+- [ ] GitOps with Argo CD
+- [ ] Monitoring stack
+- [ ] CI pipeline
+- [ ] Deploy to AKS or EKS
+- [ ] Optional: Terraform infrastructure
 
 ## Run locally with Docker Compose
 
