@@ -20,9 +20,9 @@ A kubernetes demo projec to showcase Kubernetes, containerization, and platform 
 - [x] PostgreSQL setup
 - [x] Docker Compose local environment
 - [x] Frontend service
-- [ ] Kubernetes manifests
-- [ ] Local cluster with KIND
-- [ ] Ingress controller
+- [x] Kubernetes manifests
+- [x] Local cluster with KIND
+- [x] Ingress controller
 - [ ] Helm chart
 - [ ] GitOps with Argo CD
 - [ ] Monitoring stack
@@ -35,4 +35,33 @@ A kubernetes demo projec to showcase Kubernetes, containerization, and platform 
 ```bash
 cp .env.example .env
 docker compose up --build
+```
+
+## Run on Kubernetes with KIND
+
+Make sure the local host entry exists:
+
+```bash
+echo "127.0.0.1 k8s-demo.local" | sudo tee -a /etc/hosts
+```
+
+
+Start the full Kubernetes environment:
+
+```bash
+./scripts/k8s-up.sh
+```
+
+
+Open the application:
+
+```bash
+http://k8s-demo.local
+```
+
+
+Stop and remove the cluster:
+
+```bash
+./scripts/k8s-down.sh
 ```
