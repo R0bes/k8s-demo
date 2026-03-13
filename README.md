@@ -19,7 +19,7 @@ A kubernetes demo projec to showcase Kubernetes, containerization, and platform 
 [x] Backend service
 [x] PostgreSQL setup
 [x] Docker Compose local environment
-[ ] Frontend service
+[x] Frontend service
 [ ] Kubernetes manifests
 [ ] Local cluster with KIND
 [ ] Ingress controller

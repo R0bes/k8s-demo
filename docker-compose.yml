@@ -1,4 +1,16 @@
 services:
+  frontend:
+    image: k8s-demo-frontend
+    build:
+      context: ./app/frontend
+      dockerfile: Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:${BACKEND_HOST_PORT}
+    ports:
+      - ${FRONTEND_HOST_PORT}:${FRONTEND_CONTAINER_PORT}
+    depends_on:
+      - backend
+
   backend:
     image: k8s-demo-backend
     build:
@@ -9,7 +21,7 @@ services:
     ports:
       - ${BACKEND_HOST_PORT}:${BACKEND_CONTAINER_PORT}
     depends_on:
-    - db
+      - db
 
   db:
     image: postgres:16
