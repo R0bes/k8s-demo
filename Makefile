@@ -18,3 +18,18 @@ k8s-logs-backend:
 
 k8s-logs-frontend:
 	kubectl logs -n k8s-demo deployment/frontend
+
+
+helm-up:
+	./scripts/helm-up.sh
+
+helm-down: 
+	./scripts/helm-down.sh
+
+helm-reset:
+	./scripts/helm-reset.sh
+
+helm-status:
+	helm list -n k8s-demo
+	kubectl get pods -n k8s-demo
+	kubectl get ingress -n k8s-demo
