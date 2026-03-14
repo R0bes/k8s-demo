@@ -1,4 +1,4 @@
-name: Docker Publish
+name: Docker Image
 
 on:
   workflow_call:
@@ -18,7 +18,7 @@ on:
         type: boolean
         default: false
     secrets:
-      github_token:
+      ghcr_token:
         required: true
 
 jobs:
@@ -42,7 +42,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.github_token }}
+          password: ${{ secrets.ghcr_token }}
 
       - name: Extract Docker metadata
         id: meta
