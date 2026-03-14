@@ -33,3 +33,18 @@ helm-status:
 	helm list -n k8s-demo
 	kubectl get pods -n k8s-demo
 	kubectl get ingress -n k8s-demo
+
+
+argocd-install:
+	./scripts/argocd-install.sh
+
+argocd-uninstall:
+	./scripts/argocd-uninstall.sh
+
+argocd-port-forward:
+	kubectl port-forward svc/argocd-server -n argocd 8081:443
+
+argocd-status:
+	argocd app list -n argocd
+	kubectl get pods -n argocd
+	kubectl get ingress -n argocd
