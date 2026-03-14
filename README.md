@@ -23,7 +23,7 @@ A kubernetes demo projec to showcase Kubernetes, containerization, and platform 
 - [x] Kubernetes manifests
 - [x] Local cluster with KIND
 - [x] Ingress controller
-- [ ] Helm chart
+- [x] Helm chart
 - [ ] GitOps with Argo CD
 - [ ] Monitoring stack
 - [ ] CI pipeline
@@ -64,4 +64,13 @@ Stop and remove the cluster:
 
 ```bash
 ./scripts/k8s-down.sh
+```
+
+
+## Run with helm
+
+
+```bash
+./scripts/helm-up.sh
+./scripts/helm-down.sh
 ```
