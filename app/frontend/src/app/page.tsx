@@ -70,7 +70,7 @@ export default function HomePage() {
             <p className="app-description">
               Demo Task Applikation.
             </p>
-            
+
           </div>
 
           <TaskForm

@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.db import init_db
-from app.models.task import TaskModel
 from app.routes.tasks import router as tasks_router
 
 app = FastAPI(title="Kubernetes Demo Backend", version="0.1.0")

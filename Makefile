@@ -1,4 +1,37 @@
-.PHONY: k8s-up k8s-down k8s-reset k8s-status k8s-logs-backend k8s-logs-frontend
+PYTHON := python3
+VENV := .venv
+VENV_PYTHON := $(VENV)/bin/python
+VENV_PIP := $(VENV)/bin/pip
+PRE_COMMIT := $(VENV)/bin/pre-commit
+
+.PHONY: setup setup-python setup-frontend setup-hooks lint test clean
+
+setup: setup-python setup-frontend setup-hooks
+	@echo "Repository setup complete."
+
+setup-python:
+	test -d $(VENV) || $(PYTHON) -m venv $(VENV)
+	$(VENV_PYTHON) -m pip install --upgrade pip
+	$(VENV_PIP) install -r app/backend/requirements-dev.txt
+
+setup-frontend:
+	$(MAKE) -C app/frontend setup
+
+setup-hooks:
+	$(PRE_COMMIT) install
+
+lint:
+	$(MAKE) -C app/frontend lint
+	$(MAKE) -C app/backend lint
+
+test:
+	$(MAKE) -C app/backend test
+
+clean:
+	rm -rf $(VENV)
+
+
+# Run
 
 k8s-up:
 	./scripts/k8s-up.sh
@@ -23,7 +56,7 @@ k8s-logs-frontend:
 helm-up:
 	./scripts/helm-up.sh
 
-helm-down: 
+helm-down:
 	./scripts/helm-down.sh
 
 helm-reset:

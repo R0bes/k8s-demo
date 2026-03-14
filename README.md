@@ -1,4 +1,4 @@
-# K8s Demo 
+# K8s Demo
 
 A kubernetes demo projec to showcase Kubernetes, containerization, and platform engineering skills.
 
