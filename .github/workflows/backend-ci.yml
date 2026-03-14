@@ -12,7 +12,7 @@ on:
       - ".github/workflows/backend-ci.yml"
 
 jobs:
-  test:
+  backend-test:
     runs-on: ubuntu-latest
 
     defaults:
@@ -36,12 +36,12 @@ jobs:
       - name: Run tests
         run: python -m pytest
 
-  docker-build:
+  backend-docker:
     if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
     permissions:
       contents: read
       packages: write
-    needs: test
+    needs: backend-test
     uses: ./.github/workflows/docker-image.yml
     with:
       image_name: ghcr.io/r0bes/k8s-demo-backend
