@@ -1,0 +1,35 @@
+default_install_hook_types: [pre-commit, pre-push]
+default_stages: [pre-commit]
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: check-added-large-files
+
+  - repo: local
+    hooks:
+      - id: frontend-eslint
+        name: frontend-eslint
+        entry: bash -c 'cd app/frontend && npm run lint -- "$@"' --
+        language: system
+        files: ^app/frontend/.*\.(js|jsx|ts|tsx)$
+        pass_filenames: true
+
+#      - id: backend-ruff-check
+#        name: backend-ruff-check
+#        entry: bash -c 'ruff check "$@"' --
+#        language: system
+#        files: ^app/backend/.*\.py$
+#        pass_filenames: true
+#
+#      - id: backend-ruff-format
+#        name: backend-ruff-format
+#        entry: bash -c 'ruff format "$@"' --
+#        language: system
+#        files: ^app/backend/.*\.py$
+#        pass_filenames: true
