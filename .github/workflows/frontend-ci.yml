@@ -11,7 +11,7 @@ on:
       - ".github/workflows/frontend-ci.yml"
 
 jobs:
-  test:
+  frontend-test:
     runs-on: ubuntu-latest
 
     defaults:
@@ -38,12 +38,12 @@ jobs:
       - name: Build frontend
         run: npm run build
 
-  docker:
+  frontend-docker:
     if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
     permissions:
       contents: read
       packages: write
-    needs: test
+    needs: frontend-test
     uses: ./.github/workflows/docker-image.yml
     with:
       image_name: ghcr.io/r0bes/k8s-demo-frontend
