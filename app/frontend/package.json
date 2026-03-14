@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:staged": "eslint --fix"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "npm run lint:staged --"
   },
   "dependencies": {
     "next": "16.1.6",
