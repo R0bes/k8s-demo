@@ -33,7 +33,7 @@ backend:
     name: appdb
 
 frontend:
-  replicaCount: 1
+  replicaCount: 2
 
   image:
     repository: k8s-demo-fe

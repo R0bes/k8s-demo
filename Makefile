@@ -36,7 +36,8 @@ INGRESS_NAME ?= ingress-nginx
 	db-up db-down \
 	compose-up compose-down compose-restart compose-logs \
 	kind-up kind-down kind-load-images kind-status \
-	helm-install-ingress helm-up helm-down helm-status
+	helm-install-ingress helm-up helm-down helm-status \
+	argocd-install
 
 .DEFAULT_GOAL := help
 
@@ -261,7 +262,20 @@ helm-status:
 ### ------------------------
 ###        ArgoCD
 ### ------------------------
-#
+
+ARGOCD_NAMESPACE ?= argocd
+ARGOCD_INSTALL_MANIFEST ?= https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+ARGOCD_APPLICATION_MANIFEST := ./ops/argocd/application.yaml
+
+argocd-install:
+	kubectl create namespace $(ARGOCD_NAMESPACE) --dry-run=client -o yaml | kubectl apply -f -
+	kubectl apply -n $(ARGOCD_NAMESPACE) -f $(ARGOCD_INSTALL_MANIFEST) --server-side --force-conflicts
+	kubectl rollout status deployment/argocd-server -n $(ARGOCD_NAMESPACE) --timeout=180s
+	argocd admin initial-password -n argocd
+
+argocd-port-forward:
+	kubectl port-forward svc/argocd-server -n $(ARGOCD_NAMESPACE) 8081:443
+
 #argocd-install:
 #	./scripts/argocd-install.sh
 #
