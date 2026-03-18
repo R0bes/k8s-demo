@@ -3,8 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.db import init_db
 from app.routes.tasks import router as tasks_router
+from app.version import get_app_version
 
-app = FastAPI(title="Kubernetes Demo Backend", version="0.1.0")
+APP_VERSION = get_app_version()
+
+app = FastAPI(
+    title="Kubernetes Demo Backend",
+    version=APP_VERSION,
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,6 +29,10 @@ def on_startup() -> None:
 @app.get("/health")
 def health_check() -> dict[str, str]:
     return {"status": "ok"}
+
+@app.get("/version")
+def version() -> dict[str, str]:
+    return {"version": APP_VERSION}
 
 
 app.include_router(tasks_router, prefix="/tasks", tags=["tasks"])

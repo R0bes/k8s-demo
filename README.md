@@ -6,11 +6,11 @@ A kubernetes demo projec to showcase Kubernetes, containerization, and platform 
 - Frontend: Next.js
 - Backend: FastAPI
 - Database: PostgreSQL
+- CI: GitHub Actions
 - Local Kubernetes: KIND
 - Packaging: Helm
 - GitOps: Argo CD
 - Monitoring: Prometheus + Grafana
-- CI: GitHub Actions
 - Cloud Deployment: AKS/EKS
 
 ## Roadmap
@@ -24,9 +24,9 @@ A kubernetes demo projec to showcase Kubernetes, containerization, and platform 
 - [x] Local cluster with KIND
 - [x] Ingress controller
 - [x] Helm chart
-- [ ] GitOps with Argo CD
+- [x] GitOps with Argo CD
+- [x] CI pipelines
 - [ ] Monitoring stack
-- [ ] CI pipeline
 - [ ] Deploy to AKS or EKS
 - [ ] Optional: Terraform infrastructure
 

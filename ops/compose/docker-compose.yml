@@ -6,11 +6,14 @@ services:
 # App
   frontend:
     container_name: ${APP_NAME}-fe
-    image: ${FE_IMAGE}
+    image: ${FE_IMAGE}:${APP_VERSION}
     build:
       context: ../../app/frontend
       dockerfile: Dockerfile
+      args:
+        - APP_VERSION=${APP_VERSION}
     environment:
+      APP_VERSION: ${APP_VERSION}
       NEXT_PUBLIC_API_URL: http://localhost:${BE_PORT}
     ports:
       - ${FE_PORT}:3000
@@ -19,12 +22,15 @@ services:
 
   backend:
     container_name: ${APP_NAME}-be
-    image: ${BE_IMAGE}
+    image: ${BE_IMAGE}:${APP_VERSION}
     build:
       context: ../../app/backend
       dockerfile: Dockerfile
+      args:
+        - APP_VERSION=${APP_VERSION}
     environment:
-        DB_URL: postgresql+psycopg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      APP_VERSION: ${APP_VERSION}
+      DB_URL: postgresql+psycopg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
     ports:
       - ${BE_PORT}:8000
     depends_on:
