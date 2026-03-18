@@ -203,8 +203,8 @@ kind-down:
 	-kind delete cluster --name "$(CLUSTER_NAME)"
 
 kind-load-images: kind-up docker-build
-	kind load docker-image "$(FE_IMAGE)" --name "$(CLUSTER_NAME)"
-	kind load docker-image "$(BE_IMAGE)" --name "$(CLUSTER_NAME)"
+	kind load docker-image "$(FE_IMAGE):$(APP_VERSION)" --name "$(CLUSTER_NAME)"
+	kind load docker-image "$(BE_IMAGE):$(APP_VERSION)" --name "$(CLUSTER_NAME)"
 
 # replaced by helm-ingress-install
 kind-install-ingress: kind-up

@@ -10,7 +10,10 @@ services:
     build:
       context: ../../app/frontend
       dockerfile: Dockerfile
+      args:
+        - APP_VERSION=${APP_VERSION}
     environment:
+      APP_VERSION: ${APP_VERSION}
       NEXT_PUBLIC_API_URL: http://localhost:${BE_PORT}
     ports:
       - ${FE_PORT}:3000
@@ -23,6 +26,8 @@ services:
     build:
       context: ../../app/backend
       dockerfile: Dockerfile
+      args:
+        - APP_VERSION=${APP_VERSION}
     environment:
       APP_VERSION: ${APP_VERSION}
       DB_URL: postgresql+psycopg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
