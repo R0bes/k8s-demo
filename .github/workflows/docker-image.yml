@@ -17,6 +17,9 @@ on:
         required: false
         type: boolean
         default: false
+      version_tag:
+        required: true
+        type: string
     secrets:
       ghcr_token:
         required: true
@@ -45,8 +48,9 @@ jobs:
         with:
           images: ${{ inputs.image_name }}
           tags: |
-            type=raw,value=latest
+            type=raw,value=${{ inputs.version_tag }}
             type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and optionally push image
         uses: docker/build-push-action@v6
