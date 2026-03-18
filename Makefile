@@ -265,12 +265,21 @@ helm-status:
 
 ARGOCD_NAMESPACE ?= argocd
 ARGOCD_INSTALL_MANIFEST ?= https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-ARGOCD_APPLICATION_MANIFEST := ./ops/argocd/application.yaml
 
-argocd-install:
+argocd-install: kind-install-ingress
 	kubectl create namespace $(ARGOCD_NAMESPACE) --dry-run=client -o yaml | kubectl apply -f -
 	kubectl apply -n $(ARGOCD_NAMESPACE) -f $(ARGOCD_INSTALL_MANIFEST) --server-side --force-conflicts
 	kubectl rollout status deployment/argocd-server -n $(ARGOCD_NAMESPACE) --timeout=180s
+
+#	argocd app sync k8s-demo-dev
+argocd-up-dev: argocd-install kind-load-images
+	kubectl apply -f ops/argocd/app-dev.yaml
+	kubectl get application k8s-demo-dev -n $(ARGOCD_NAMESPACE)
+
+argocd-up-prod: argocd-install
+	kubectl apply -f ops/argocd/app-prod.yaml
+	kubectl get application k8s-demo-prod -n $(ARGOCD_NAMESPACE)
+
 
 argocd-ui:
 	argocd admin initial-password -n argocd
