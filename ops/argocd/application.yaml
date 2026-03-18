@@ -9,15 +9,15 @@ spec:
   source:
     repoURL: https://github.com/R0bes/k8s-demo.git
     targetRevision: main
-    path: ops/helm/k8s-demo
+    path: ops/helm
 
   destination:
     server: https://kubernetes.default.svc
     namespace: k8s-demo
 
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+    #automated:
+    #  prune: true
+    #  selfHeal: true
     syncOptions:
       - CreateNamespace=true

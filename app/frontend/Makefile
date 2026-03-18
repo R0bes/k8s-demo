@@ -1,16 +1,24 @@
-.PHONY: setup lint lint-fix build dev
+NPM := npm
+
+.PHONY: setup run-dev lint lint-fix build test
 
 setup:
-	npm ci
+	$(NPM) ci
+
+run-dev:
+	$(NPM) run dev
 
 lint:
-	npm run lint
+	$(NPM) run lint
 
 lint-fix:
-	npm run lint:fix
+	$(NPM) run lint:fix
 
 build:
-	npm run build
+	$(NPM) run build
 
-dev:
-	npm run dev
+format:
+	@echo "No formating implemented yet"
+
+test:
+	@echo "No tests implemented yet"

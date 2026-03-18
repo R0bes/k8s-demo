@@ -1,0 +1,47 @@
+---
+name: ${APP_NAME}-compose
+
+services:
+
+# App
+  frontend:
+    container_name: ${APP_NAME}-fe
+    image: ${FE_IMAGE}
+    build:
+      context: ../../app/frontend
+      dockerfile: Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:${BE_PORT}
+    ports:
+      - ${FE_PORT}:3000
+    depends_on:
+      - backend
+
+  backend:
+    container_name: ${APP_NAME}-be
+    image: ${BE_IMAGE}
+    build:
+      context: ../../app/backend
+      dockerfile: Dockerfile
+    environment:
+        DB_URL: postgresql+psycopg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+    ports:
+      - ${BE_PORT}:8000
+    depends_on:
+      - db
+
+# Infrastructure
+  db:
+    container_name: ${APP_NAME}-db
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
