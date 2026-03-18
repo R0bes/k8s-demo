@@ -6,7 +6,7 @@ repos:
     rev: v5.0.0
     hooks:
       - id: check-yaml
-        exclude: ^ops/helm/.*/templates/.*\.ya?ml$
+        exclude: ^ops/helm/templates/.*\.ya?ml$
       - id: end-of-file-fixer
       - id: trailing-whitespace
       - id: check-merge-conflict

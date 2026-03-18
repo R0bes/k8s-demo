@@ -14,12 +14,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.on_event("startup")
 def on_startup() -> None:
     init_db()
 
+
 @app.get("/health")
 def health_check() -> dict[str, str]:
     return {"status": "ok"}
+
 
 app.include_router(tasks_router, prefix="/tasks", tags=["tasks"])

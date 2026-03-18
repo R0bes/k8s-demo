@@ -4,80 +4,274 @@ VENV_PYTHON := $(VENV)/bin/python
 VENV_PIP := $(VENV)/bin/pip
 PRE_COMMIT := $(VENV)/bin/pre-commit
 
-.PHONY: setup setup-python setup-frontend setup-hooks lint test clean
+FRONTEND_DIR := ./app/frontend
+BACKEND_DIR := ./app/backend
 
-setup: setup-python setup-frontend setup-hooks
-	@echo "Repository setup complete."
+COMPOSE_FILE := ./ops/compose/docker-compose.yml
+HELM_DIR=./ops/helm
 
-setup-python:
+ENV_FILE ?= ./.env
+
+ifneq (,$(wildcard $(ENV_FILE)))
+include $(ENV_FILE)
+export $(shell sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/\1/p' $(ENV_FILE))
+endif
+
+APP_NAME ?= k8s-demo
+CLUSTER_NAME ?= $(APP_NAME)
+KIND_CONFIG ?= ./ops/kind/config.yaml
+HELM_NAMESPACE ?= $(APP_NAME)
+HELM_RELEASE ?= $(APP_NAME)
+INGRESS_NAME ?= ingress-nginx
+
+
+
+
+.PHONY: help \
+	setup-repo clean \
+	setup-be setup-fe \
+    dev-be dev-fe \
+    lint format test  \
+	docker-build-be docker-build-fe docker-build \
+	db-up db-down \
+	compose-up compose-down compose-restart compose-logs \
+	kind-up kind-down kind-load-images kind-status \
+	helm-install-ingress helm-up helm-down helm-status
+
+.DEFAULT_GOAL := help
+
+
+### ------------------------
+###          Repo
+### ------------------------
+
+help:
+	@echo ""
+	@echo "Available targets:"
+	@echo ""
+	@echo "  Repo setup"
+	@echo "    setup-repo           Setup virtualenv and pre-commit hooks"
+	@echo "    clean                Remove virtualenv"
+	@echo ""
+	@echo "  Local development"
+	@echo "    setup-be             Setup backend for local development"
+	@echo "    setup-fe             Setup frontend for local development"
+	@echo "    dev-be               Start backend in dev mode (local DB via docker)"
+	@echo "    dev-fe               Start frontend in dev mode"
+	@echo "    lint                 Run frontend and backend linters"
+	@echo "    format               Run frontend and backend formatters"
+	@echo "    test                 Run frontend and backend tests"
+	@echo ""
+	@echo "  Docker"
+	@echo "    docker-build-be      Build backend image with docker compose"
+	@echo "    docker-build-fe      Build frontend image with docker compose"
+	@echo "    docker-build         Build backend and frontend images"
+	@echo ""
+	@echo "  Docker Compose"
+	@echo "    db-up                Start database container"
+	@echo "    db-down              Stop database container"
+	@echo "    compose-up           Start full compose stack"
+	@echo "    compose-down         Stop full compose stack"
+	@echo "    compose-restart      Restart full compose stack"
+	@echo "    compose-logs         Follow compose logs"
+	@echo ""
+	@echo "  kind (Cluster)"
+	@echo "    kind-up              Create local kind cluster if needed"
+	@echo "    kind-down            Delete local kind cluster"
+	@echo "    kind-load-images     Load app images into kind (build if necessary)"
+	@echo "    kind-status          Show kind cluster status"
+	@echo ""
+	@echo "  Helm (App)"
+	@echo "    helm-install-ingress Install ingress-nginx via Helm"
+	@echo "    helm-up              Deploy application chart"
+	@echo "    helm-down            Remove application chart"
+	@echo "    helm-status          Show Helm release and Kubernetes resources"
+	@echo ""
+
+setup-repo:
+	@echo "Setup python venv..."
 	test -d $(VENV) || $(PYTHON) -m venv $(VENV)
-	$(VENV_PYTHON) -m pip install --upgrade pip
-	$(VENV_PIP) install -r app/backend/requirements-dev.txt
 
-setup-frontend:
-	$(MAKE) -C app/frontend setup
+	@echo "Upgrade pip..."
+	$(VENV_PIP) install --upgrade pip
 
-setup-hooks:
+	@echo "Install pre-commit..."
+	$(VENV_PIP) install pre-commit
+
+	@echo "Setup hooks..."
 	$(PRE_COMMIT) install
-
-lint:
-	$(MAKE) -C app/frontend lint
-	$(MAKE) -C app/backend lint
-
-test:
-	$(MAKE) -C app/backend test
 
 clean:
 	rm -rf $(VENV)
 
 
-# Run
 
-k8s-up:
-	./scripts/k8s-up.sh
+### ------------------------
+###      Local dev
+### ------------------------
 
-k8s-down:
-	./scripts/k8s-down.sh
+DEV_DB_URL ?= postgresql+psycopg://$(DB_USER):$(DB_PASSWORD)@localhost:$(DB_PORT)/$(DB_NAME)
 
-k8s-reset:
-	./scripts/k8s-reset.sh
+setup-be: setup-repo
+	@echo "Setting up backend..."
+	$(MAKE) -C $(BACKEND_DIR) setup
 
-k8s-status:
-	kubectl get pods -n k8s-demo
-	kubectl get ingress -n k8s-demo
+setup-fe: setup-repo
+	@echo "Setting up frontend..."
+	$(MAKE) -C $(FRONTEND_DIR) setup
 
-k8s-logs-backend:
-	kubectl logs -n k8s-demo deployment/backend
+dev-be: db-up setup-be
+	$(MAKE) -C $(BACKEND_DIR) run-dev DB_URL="$(DEV_DB_URL)"
 
-k8s-logs-frontend:
-	kubectl logs -n k8s-demo deployment/frontend
+dev-fe: setup-fe
+	$(MAKE) -C $(FRONTEND_DIR) run-dev
 
 
-helm-up:
-	./scripts/helm-up.sh
+lint:
+	$(MAKE) -C $(FRONTEND_DIR) lint
+	$(MAKE) -C $(BACKEND_DIR) lint
+
+format:
+	$(MAKE) -C $(FRONTEND_DIR) format
+	$(MAKE) -C $(BACKEND_DIR) format
+
+test:
+	$(MAKE) -C $(FRONTEND_DIR) test
+	$(MAKE) -C $(BACKEND_DIR) test
+
+
+
+
+
+
+### ------------------------
+###         Docker
+### ------------------------
+
+
+docker-build-be:
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) build backend
+
+docker-build-fe:
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) build frontend
+
+docker-build:
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) build backend frontend
+
+
+
+### ------------------------
+###     Docker Compose
+### ------------------------
+
+db-up:
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) up db -d
+
+db-down:
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) down db
+
+compose-up:
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) up -d
+
+compose-down:
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) down
+
+compose-restart: compose-down compose-up
+
+compose-logs:
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) logs -f
+
+
+
+### ------------------------
+###       Kind Cluster
+### ------------------------
+
+INGRESS_MANIFEST = https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+
+kind-up:
+	@if ! kind get clusters | grep -qx "$(CLUSTER_NAME)"; then \
+		kind create cluster \
+			--name "$(CLUSTER_NAME)" \
+			--config "$(KIND_CONFIG)"; \
+	else \
+		echo "Cluster already exists"; \
+	fi
+
+kind-down:
+	-kind delete cluster --name "$(CLUSTER_NAME)"
+
+kind-load-images: kind-up docker-build
+	kind load docker-image "$(FE_IMAGE)" --name "$(CLUSTER_NAME)"
+	kind load docker-image "$(BE_IMAGE)" --name "$(CLUSTER_NAME)"
+
+# replaced by helm-ingress-install
+kind-install-ingress: kind-up
+	kubectl apply -f "$(INGRESS_MANIFEST)"
+	kubectl rollout status deployment/ingress-nginx-controller -n "$(INGRESS_NAME)" --timeout=180s
+
+kind-status:
+	kubectl cluster-info --context kind-$(CLUSTER_NAME)
+	kubectl get nodes --context kind-$(CLUSTER_NAME)
+
+
+
+
+### ------------------------
+###         Helm
+### ------------------------
+
+
+helm-install-ingress: kind-up
+	helm repo add $(INGRESS_NAME) https://kubernetes.github.io/ingress-nginx 2>/dev/null || true
+	helm repo update
+	helm upgrade --install $(INGRESS_NAME) ingress-nginx/ingress-nginx \
+  		--namespace $(INGRESS_NAME) \
+  		--create-namespace \
+  		--version 4.15.0 \
+		--set controller.hostPort.enabled=true \
+		--set controller.hostPort.ports.http=80 \
+		--set controller.hostPort.ports.https=443 \
+		--set controller.extraArgs.publish-status-address=localhost
+	kubectl rollout status deployment/ingress-nginx-controller -n $(INGRESS_NAME) --timeout=180s
+
+
+helm-up: kind-install-ingress kind-load-images
+	helm upgrade --install $(HELM_RELEASE) $(HELM_DIR) \
+		--namespace $(HELM_NAMESPACE) \
+		--create-namespace
+	kubectl rollout status deployment/postgres -n $(HELM_NAMESPACE) --timeout=180s
+	kubectl rollout status deployment/backend -n $(HELM_NAMESPACE) --timeout=180s
+	kubectl rollout status deployment/frontend -n $(HELM_NAMESPACE) --timeout=180s
 
 helm-down:
-	./scripts/helm-down.sh
+	-helm uninstall $(HELM_RELEASE) -n $(HELM_NAMESPACE)
 
-helm-reset:
-	./scripts/helm-reset.sh
 
 helm-status:
-	helm list -n k8s-demo
-	kubectl get pods -n k8s-demo
-	kubectl get ingress -n k8s-demo
+	helm list -n $(HELM_NAMESPACE)
+	kubectl get pods -n $(HELM_NAMESPACE)
+	kubectl get ingress -n $(HELM_NAMESPACE)
 
 
-argocd-install:
-	./scripts/argocd-install.sh
 
-argocd-uninstall:
-	./scripts/argocd-uninstall.sh
 
-argocd-port-forward:
-	kubectl port-forward svc/argocd-server -n argocd 8081:443
 
-argocd-status:
-	argocd app list -n argocd
-	kubectl get pods -n argocd
-	kubectl get ingress -n argocd
+
+### ------------------------
+###        ArgoCD
+### ------------------------
+#
+#argocd-install:
+#	./scripts/argocd-install.sh
+#
+#argocd-uninstall:
+#	./scripts/argocd-uninstall.sh
+#
+#argocd-port-forward:
+#	kubectl port-forward svc/argocd-server -n argocd 8081:443
+#
+#argocd-status:
+#	argocd app list -n argocd
+#	kubectl get pods -n argocd
+#	kubectl get ingress -n argocd

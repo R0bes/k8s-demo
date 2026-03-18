@@ -44,7 +44,7 @@ spec:
                 secretKeyRef:
                   name: backend-secret
                   key: POSTGRES_PASSWORD
-            - name: DATABASE_URL
+            - name: DB_URL
               value: postgresql+psycopg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)
           readinessProbe:
             httpGet:
