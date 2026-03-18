@@ -11,8 +11,12 @@ on:
       - ".github/workflows/frontend-ci.yml"
 
 jobs:
-  frontend-test:
+  version:
+    uses: ./.github/workflows/versioning.yml
+
+  test:
     runs-on: ubuntu-latest
+    needs: version
 
     defaults:
       run:
@@ -36,18 +40,23 @@ jobs:
         run: npm run lint
 
       - name: Build frontend
+        env:
+          APP_VERSION: ${{ needs.version.outputs.full-semver }}
         run: npm run build
 
-  frontend-docker:
-    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+  docker:
     permissions:
       contents: read
       packages: write
-    needs: frontend-test
+    needs:
+      - version
+      - test
     uses: ./.github/workflows/docker-image.yml
     with:
-      image_name: ghcr.io/r0bes/k8s-demo-frontend
+      image_name: ghcr.io/r0bes/k8s-demo-fe
       context: ./app/frontend
+      dockerfile: Dockerfile
+      version_tag: ${{ needs.version.outputs.full-semver }}
       push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     secrets:
       ghcr_token: ${{ secrets.GITHUB_TOKEN }}

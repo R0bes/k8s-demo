@@ -8,7 +8,7 @@ spec:
 
   source:
     repoURL: https://github.com/R0bes/k8s-demo.git
-    targetRevision: main
+    targetRevision: ci/versioning
     path: ops/helm
 
   destination:

@@ -271,21 +271,15 @@ argocd-install:
 	kubectl create namespace $(ARGOCD_NAMESPACE) --dry-run=client -o yaml | kubectl apply -f -
 	kubectl apply -n $(ARGOCD_NAMESPACE) -f $(ARGOCD_INSTALL_MANIFEST) --server-side --force-conflicts
 	kubectl rollout status deployment/argocd-server -n $(ARGOCD_NAMESPACE) --timeout=180s
-	argocd admin initial-password -n argocd
 
-argocd-port-forward:
+argocd-ui:
+	argocd admin initial-password -n argocd
 	kubectl port-forward svc/argocd-server -n $(ARGOCD_NAMESPACE) 8081:443
 
-#argocd-install:
-#	./scripts/argocd-install.sh
-#
-#argocd-uninstall:
-#	./scripts/argocd-uninstall.sh
-#
-#argocd-port-forward:
-#	kubectl port-forward svc/argocd-server -n argocd 8081:443
-#
-#argocd-status:
-#	argocd app list -n argocd
-#	kubectl get pods -n argocd
-#	kubectl get ingress -n argocd
+argocd-uninstall:
+	kubectl delete namespace $(ARGOCD_NAMESPACE)
+
+argocd-status:
+	argocd app list -n $(ARGOCD_NAMESPACE)
+	kubectl get pods -n $(ARGOCD_NAMESPACE)
+	kubectl get ingress -n $(ARGOCD_NAMESPACE)
