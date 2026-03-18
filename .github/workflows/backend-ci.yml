@@ -48,7 +48,6 @@ jobs:
         run: python -m pytest
 
   docker:
-    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
     permissions:
       contents: read
       packages: write
