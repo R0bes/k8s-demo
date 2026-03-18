@@ -35,6 +35,8 @@ jobs:
           git branch -a
           git tag
           git log --oneline --decorate -20
+          echo >> "Gitversion.yml"
+          cat GitVersion.yml
 
       - name: Setup GitVersion
         uses: gittools/actions/gitversion/setup@v3
