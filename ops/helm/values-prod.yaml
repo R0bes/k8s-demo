@@ -1,0 +1,16 @@
+backend:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/r0bes/k8s-demo-be
+    tag: "0.2.0"
+    pullPolicy: IfNotPresent
+
+frontend:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/r0bes/k8s-demo-be
+    tag: "0.2.0"
+    pullPolicy: IfNotPresent
+
+ingress:
+  host: prod.k8s-demo.local

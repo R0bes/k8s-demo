@@ -18,31 +18,25 @@ postgres:
 
 backend:
   replicaCount: 1
-
   image:
-    repository: ghcr.io/r0bes/k8s-demo-backend
-    tag: latest
+    repository: ghcr.io/r0bes/k8s-demo-be
+    tag: dev
     pullPolicy: IfNotPresent
-
   service:
     port: 8000
-
   database:
     host: postgres
     port: 5432
     name: appdb
 
 frontend:
-  replicaCount: 2
-
+  replicaCount: 1
   image:
-    repository: ghcr.io/r0bes/k8s-demo-frontend
+    repository: ghcr.io/r0bes/k8s-demo-fe
     tag: latest
     pullPolicy: IfNotPresent
-
   service:
     port: 3000
-
   apiUrl: /api
 
 ingress:

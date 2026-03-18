@@ -1,0 +1,16 @@
+backend:
+  replicaCount: 1
+  image:
+    repository: k8s-demo-be
+    tag: dev
+    pullPolicy: IfNotPresent
+
+frontend:
+  replicaCount: 1
+  image:
+    repository: k8s-demo-fe
+    tag: dev
+    pullPolicy: IfNotPresent
+
+ingress:
+  host: dev.k8s-demo.local
