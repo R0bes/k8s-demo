@@ -114,7 +114,7 @@ jobs:
       - name: Log compose
         env:
           APP_VERSION: ${{ env.APP_VERSION }}
-        run: docker compose -f ./ops/compose/docker-compose.yml --env-file ci.env logs be
+        run: docker compose -f ./ops/compose/docker-compose.yml --env-file ci.env logs backend
 
       - name: Log compose
         env:
