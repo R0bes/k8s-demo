@@ -151,13 +151,13 @@ test:
 
 
 docker-build-be:
-	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) build backend
+	docker compose -f $(COMPOSE_FILE) build backend
 
 docker-build-fe:
-	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) build frontend
+	docker compose -f $(COMPOSE_FILE) build frontend
 
 docker-build:
-	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) build backend frontend
+	docker compose -f $(COMPOSE_FILE) build backend frontend
 
 
 
@@ -166,21 +166,25 @@ docker-build:
 ### ------------------------
 
 db-up:
-	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) up db -d
+	docker compose -f $(COMPOSE_FILE) up db -d
 
 db-down:
-	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) down db
+	docker compose -f $(COMPOSE_FILE) down db
 
 compose-up:
-	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) up -d
+	docker compose -f $(COMPOSE_FILE) up -d
 
 compose-down:
-	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) down
+	docker compose -f $(COMPOSE_FILE) down
+compose-down-v:
+	docker compose -f $(COMPOSE_FILE) down -v
 
 compose-restart: compose-down compose-up
 
 compose-logs:
-	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) logs -f
+	docker compose -f $(COMPOSE_FILE) logs
+compose-logs-f:
+	docker compose -f $(COMPOSE_FILE) logs -f
 
 
 
@@ -203,8 +207,8 @@ kind-down:
 	-kind delete cluster --name "$(CLUSTER_NAME)"
 
 kind-load-images: kind-up docker-build
-	kind load docker-image "$(FE_IMAGE):$(APP_VERSION)" --name "$(CLUSTER_NAME)"
-	kind load docker-image "$(BE_IMAGE):$(APP_VERSION)" --name "$(CLUSTER_NAME)"
+	kind load docker-image "$(FE_IMAGE):$(IMAGE_TAG)" --name "$(CLUSTER_NAME)"
+	kind load docker-image "$(BE_IMAGE):$(IMAGE_TAG)" --name "$(CLUSTER_NAME)"
 
 # replaced by helm-ingress-install
 kind-install-ingress: kind-up

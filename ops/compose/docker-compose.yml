@@ -6,35 +6,33 @@ services:
 # App
   frontend:
     container_name: ${APP_NAME}-fe
-    image: ${FE_IMAGE}:${APP_VERSION}
+    image: ${FE_IMAGE}:${IMAGE_TAG}
     build:
       context: ../../app/frontend
       dockerfile: Dockerfile
       args:
-        - APP_VERSION=${APP_VERSION}
-    environment:
-      APP_VERSION: ${APP_VERSION}
-      NEXT_PUBLIC_API_URL: http://localhost:${BE_PORT}
+        APP_VERSION: ${APP_VERSION}
+        NEXT_PUBLIC_API_URL: http://localhost:${BE_PORT}
     ports:
-      - ${FE_PORT}:3000
+      - ${FE_PORT:-3000}:3000
     depends_on:
       - backend
 
   backend:
     container_name: ${APP_NAME}-be
-    image: ${BE_IMAGE}:${APP_VERSION}
+    image: ${BE_IMAGE}:${IMAGE_TAG}
     build:
       context: ../../app/backend
       dockerfile: Dockerfile
       args:
-        - APP_VERSION=${APP_VERSION}
+        APP_VERSION: ${APP_VERSION}
     environment:
-      APP_VERSION: ${APP_VERSION}
       DB_URL: postgresql+psycopg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
     ports:
-      - ${BE_PORT}:8000
+      - ${BE_PORT:-8000}:8000
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 # Infrastructure
   db:
@@ -45,9 +43,14 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${DB_PORT}:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
 volumes:
   postgres_data:
