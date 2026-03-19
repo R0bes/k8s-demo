@@ -176,6 +176,8 @@ compose-up:
 
 compose-down:
 	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) down
+compose-down-v:
+	docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) down -v
 
 compose-restart: compose-down compose-up
 

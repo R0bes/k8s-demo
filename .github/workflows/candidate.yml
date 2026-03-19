@@ -1,0 +1,8 @@
+name: Candidate
+
+on:
+  pull_request:
+
+jobs:
+  version:
+    uses: ./.github/workflows/versioning.yml
