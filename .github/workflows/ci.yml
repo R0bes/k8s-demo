@@ -111,6 +111,16 @@ jobs:
           APP_VERSION: ${{ env.APP_VERSION }}
         run: docker compose -f ./ops/compose/docker-compose.yml --env-file ci.env logs
 
+      - name: Log compose
+        env:
+          APP_VERSION: ${{ env.APP_VERSION }}
+        run: docker compose -f ./ops/compose/docker-compose.yml --env-file ci.env logs be
+
+      - name: Log compose
+        env:
+          APP_VERSION: ${{ env.APP_VERSION }}
+        run: docker logs k8s-demo-be
+
 
       - name: Wait for backend
         run: |
