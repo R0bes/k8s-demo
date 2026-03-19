@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -57,10 +57,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "22"
           cache: "npm"
@@ -87,7 +87,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Create env file
         run: |
@@ -110,16 +110,18 @@ jobs:
           done
           exit 1
 
-      - name: Check backend version endpoint
-        run: curl -fsS http://localhost:8000/version | grep "$APP_VERSION"
-
-      - name: Check frontend
+      - name: Check backend version
         run: |
-          ACTUAL_VERSION="$(curl -fsS http://localhost:3000 | grep -oP 'Frontend:\s*<!-- -->\K[^<]+')"
-          test "$ACTUAL_VERSION" = "${{ env.APP_VERSION }}"
+          ACTUAL_BE_VERSION="$(curl -fsS http://localhost:8000/version | python -c "import sys, json; print(json.load(sys.stdin)['version'])")"
+          echo "Backend version: $ACTUAL_BE_VERSION"
+          test "$ACTUAL_BE_VERSION" = "${{ env.APP_VERSION }}"
+
+      - name: Check frontend version
+        run: |
+          ACTUAL_FE_VERSION="$(curl -fsS http://localhost:3000 | grep -oP 'Frontend:\s*<!-- -->\K[^<]+')"
+          echo "Frontend version: $ACTUAL_FE_VERSION"
+          test "$ACTUAL_FE_VERSION" = "${{ env.APP_VERSION }}"
 
       - name: Stop stack
         if: always()
-        env:
-          APP_VERSION: ${{ env.APP_VERSION }}
-        run: docker compose -f ./ops/compose/docker-compose.yml --env-file ci.env down -v
+        run: make compose-down-v
