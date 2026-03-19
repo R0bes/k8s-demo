@@ -91,18 +91,9 @@ jobs:
 
       - name: Create env file
         run: |
-          cat > .env <<EOF
-          APP_NAME=k8s-demo
+          cat >> ci.env <<EOF
           APP_VERSION=${{ env.APP_VERSION }}
           IMAGE_TAG=${{ env.APP_VERSION }}
-          FE_IMAGE=ghcr.io/r0bes/k8s-demo-fr
-          BE_IMAGE=ghcr.io/r0bes/k8s-demo-be
-          FE_PORT=3000
-          BE_PORT=8000
-          DB_PORT=5432
-          DB_NAME=demo-db
-          DB_USER=demo-user
-          DB_PASSWORD=demo-password
           EOF
 
       - name: Build containers
@@ -114,6 +105,12 @@ jobs:
         env:
           APP_VERSION: ${{ env.APP_VERSION }}
         run: make compose-up
+
+      - name: Log compose
+        env:
+          APP_VERSION: ${{ env.APP_VERSION }}
+        run: docker compose -f ./ops/compose/docker-compose.yml --env-file ci.env logs
+
 
       - name: Wait for backend
         run: |
@@ -142,4 +139,4 @@ jobs:
 
       - name: Stop stack
         if: always()
-        run: docker compose-down-v
+        run: make compose-down-v
