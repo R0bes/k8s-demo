@@ -8,6 +8,8 @@ import { useTheme } from "@/hooks/useTheme";
 import { TaskForm } from "@/components/TaskForm";
 import { TaskList } from "@/components/TaskList";
 
+import { AppFooter } from "@/components/AppFooter";
+
 import { createTask, getTasks, type Task } from "@/lib/api";
 
 
@@ -61,16 +63,17 @@ export default function HomePage() {
     <main className="app-shell">
       <div className="app-container">
         <div className="app-card">
+
           <div className="theme-toggle-wrapper">
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
           </div>
+
           <div style={{ marginBottom: "24px" }}>
             <p className="app-eyebrow">Demo App</p>
             <h1 className="app-title">Kubernetes Demo</h1>
             <p className="app-description">
               Demo Task Applikation.
             </p>
-
           </div>
 
           <TaskForm
@@ -86,6 +89,8 @@ export default function HomePage() {
             <h2 className="task-heading">Tasks</h2>
             <TaskList tasks={tasks} isLoading={isLoading} />
           </div>
+
+          <AppFooter />
         </div>
       </div>
     </main>
