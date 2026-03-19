@@ -89,6 +89,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create candidate env file
+        run: |
+          cat > .env.candidate <<EOF
+          APP_NAME=k8s-demo
+          APP_VERSION=${{ env.APP_VERSION }}
+          IMAGE_TAG=${{ env.APP_VERSION }}
+          FE_IMAGE=ghcr.io/${{ github.repository_owner }}/k8s-demo-fr
+          BE_IMAGE=ghcr.io/${{ github.repository_owner }}/k8s-demo-be
+          FE_PORT=3000
+          BE_PORT=8000
+          DB_PORT=5432
+          DB_NAME=demo-db
+          DB_USER=demo-user
+          DB_PASSWORD=demo-password
+          EOF
+
       - name: Build containers
         env:
           APP_VERSION: ${{ env.APP_VERSION }}
