@@ -106,6 +106,15 @@ jobs:
           APP_VERSION: ${{ env.APP_VERSION }}
         run: docker compose -f ./ops/compose/docker-compose.yml --env-file ci.env up -d
 
+      - name: Show compose status
+        run: docker compose -f ./ops/compose/docker-compose.yml --env-file ci.env ps -a
+
+      - name: Inspect backend container
+        run: docker inspect k8s-demo-be
+
+      - name: Show backend state
+        run: docker inspect --format='{{json .State}}' k8s-demo-be
+
       - name: Log compose
         env:
           APP_VERSION: ${{ env.APP_VERSION }}
