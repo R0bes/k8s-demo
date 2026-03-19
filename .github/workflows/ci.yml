@@ -89,9 +89,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create candidate env file
+      - name: Create env file
         run: |
-          cat > .env.candidate <<EOF
+          cat > .env <<EOF
           APP_NAME=k8s-demo
           APP_VERSION=${{ env.APP_VERSION }}
           IMAGE_TAG=${{ env.APP_VERSION }}
