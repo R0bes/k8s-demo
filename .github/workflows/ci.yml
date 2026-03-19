@@ -95,8 +95,8 @@ jobs:
           APP_NAME=k8s-demo
           APP_VERSION=${{ env.APP_VERSION }}
           IMAGE_TAG=${{ env.APP_VERSION }}
-          FE_IMAGE=ghcr.io/${{ github.repository_owner }}/k8s-demo-fr
-          BE_IMAGE=ghcr.io/${{ github.repository_owner }}/k8s-demo-be
+          FE_IMAGE=ghcr.io/r0bes/k8s-demo-fr
+          BE_IMAGE=ghcr.io/r0bes/k8s-demo-be
           FE_PORT=3000
           BE_PORT=8000
           DB_PORT=5432
