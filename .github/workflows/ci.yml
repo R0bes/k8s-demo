@@ -91,45 +91,14 @@ jobs:
 
       - name: Create env file
         run: |
-          cat >> ci.env <<EOF
-          APP_VERSION=${{ env.APP_VERSION }}
-          IMAGE_TAG=${{ env.APP_VERSION }}
-          EOF
+          sed -i "s/^APP_VERSION=.*/APP_VERSION=${{ env.APP_VERSION }}/" .env
+          sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=${{ env.APP_VERSION }}/" .env
 
       - name: Build containers
-        env:
-          APP_VERSION: ${{ env.APP_VERSION }}
-        run: docker compose -f ./ops/compose/docker-compose.yml --env-file ci.env build
+        run: make docker-build
 
       - name: Run compose stack
-        env:
-          APP_VERSION: ${{ env.APP_VERSION }}
-        run: docker compose -f ./ops/compose/docker-compose.yml --env-file ci.env up -d
-
-      - name: Show compose status
-        run: docker compose -f ./ops/compose/docker-compose.yml --env-file ci.env ps -a
-
-      - name: Inspect backend container
-        run: docker inspect k8s-demo-be
-
-      - name: Show backend state
-        run: docker inspect --format='{{json .State}}' k8s-demo-be
-
-      - name: Log compose
-        env:
-          APP_VERSION: ${{ env.APP_VERSION }}
-        run: docker compose -f ./ops/compose/docker-compose.yml --env-file ci.env logs
-
-      - name: Log compose
-        env:
-          APP_VERSION: ${{ env.APP_VERSION }}
-        run: docker compose -f ./ops/compose/docker-compose.yml --env-file ci.env logs backend
-
-      - name: Log compose
-        env:
-          APP_VERSION: ${{ env.APP_VERSION }}
-        run: docker logs k8s-demo-be
-
+        run: make compose-up
 
       - name: Wait for backend
         run: |
@@ -142,19 +111,12 @@ jobs:
           exit 1
 
       - name: Check backend version endpoint
-        env:
-          APP_VERSION: ${{ env.APP_VERSION }}
         run: curl -fsS http://localhost:8000/version | grep "$APP_VERSION"
 
       - name: Check frontend
         run: |
-          for i in {1..30}; do
-            if curl -fsS http://localhost:3000; then
-              exit 0
-            fi
-            sleep 2
-          done
-          exit 1
+          ACTUAL_VERSION="$(curl -fsS http://localhost:3000 | grep -oP 'Frontend:\s*<!-- -->\K[^<]+')"
+          test "$ACTUAL_VERSION" = "${{ env.APP_VERSION }}"
 
       - name: Stop stack
         if: always()

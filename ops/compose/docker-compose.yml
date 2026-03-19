@@ -14,7 +14,7 @@ services:
         APP_VERSION: ${APP_VERSION}
         NEXT_PUBLIC_API_URL: http://localhost:${BE_PORT}
     ports:
-      - ${FE_PORT}:3000
+      - ${FE_PORT:-3000}:3000
     depends_on:
       - backend
 
@@ -29,7 +29,7 @@ services:
     environment:
       DB_URL: postgresql+psycopg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
     ports:
-      - ${BE_PORT}:8000
+      - ${BE_PORT:-8000}:8000
     depends_on:
       db:
         condition: service_healthy
@@ -43,7 +43,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${DB_PORT}:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
