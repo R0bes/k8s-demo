@@ -89,4 +89,4 @@ jobs:
           IMAGE_TAG: ${{ needs.prepare-version.outputs.image_tag }}
           FE_IMAGE: ${{ env.FE_IMAGE }}
           BE_IMAGE: ${{ env.BE_IMAGE }}
-        run: docker compose -f ops/compose/compose.yaml push
+        run: docker compose -f ops/compose/docker-compose.yaml push
