@@ -22,8 +22,8 @@ jobs:
     name: Prepare candidate version
     runs-on: ubuntu-latest
     outputs:
-      app_version: ${{ steps.export.outputs.app_version }}
-      image_tag: ${{ steps.export.outputs.image_tag }}
+      semVer: ${{ steps.export.outputs.app_version }}
+      majorMinorPatch: ${{ steps.export.outputs.majorMinorPatch }}
       short_sha: ${{ steps.sha.outputs.short_sha }}
 
     steps:
@@ -55,8 +55,8 @@ jobs:
       - name: Export candidate metadata
         id: export
         run: |
-          echo "app_version=${{ steps.version.outputs.semVer }}" >> "$GITHUB_OUTPUT"
-          echo "image_tag=${{ steps.version.outputs.semVer }}" >> "$GITHUB_OUTPUT"
+          echo "semVer=${{ steps.version.outputs.semVer }}" >> "$GITHUB_OUTPUT"
+          echo "majorMinorPatch=${{ steps.version.outputs.majorMinorPatch }}" >> "$GITHUB_OUTPUT"
 
   build-and-push:
     name: Build and push candidate images
@@ -76,8 +76,8 @@ jobs:
 
       - name: Create env file
         run: |
-          sed -i "s|^APP_VERSION=.*|APP_VERSION=${{ needs.prepare-version.outputs.app_version }}|" .env
-          sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=${{ needs.prepare-version.outputs.image_tag }}|" .env
+          sed -i "s|^APP_VERSION=.*|APP_VERSION=${{ needs.prepare-version.outputs.semVer }}|" .env
+          sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=${{ needs.prepare-version.outputs.majorMinorPatch }}-candidate.${{ github.run_number }}|" .env
           sed -i "s|^FE_IMAGE=.*|FE_IMAGE=${{ env.FE_IMAGE }}|" .env
           sed -i "s|^BE_IMAGE=.*|BE_IMAGE=${{ env.BE_IMAGE }}|" .env
 
@@ -85,4 +85,4 @@ jobs:
         run: make docker-build
 
       - name: Push candidate images
-        run: docker compose -f ./ops/compose/docker-compose.yml --env-file .env push
+        run: docker compose -f ./ops/compose/docker-compose.yml push
