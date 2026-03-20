@@ -16,6 +16,7 @@ on:
 permissions:
   contents: write
   packages: write
+  pull-requests: write
 
 env:
   FE_IMAGE: ghcr.io/r0bes/k8s-demo-fe
