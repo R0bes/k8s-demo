@@ -60,7 +60,7 @@ jobs:
 
       - name: Ensure release tag does not already exist
         run: |
-          if docker manifest inspect "${BE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}" >/dev/null 2>&1; then
+          if docker manifest inspect "${{ env.BE_IMAGE }}:${{ needs.prepare-release.outputs.target_tag }}" >/dev/null 2>&1; then
             echo "Release tag already exists: ${{ needs.prepare-release.outputs.target_tag }}"
             exit 1
           fi
@@ -74,26 +74,26 @@ jobs:
 
       - name: Pull RC images
         run: |
-          docker pull "${FE_IMAGE}:${{ needs.prepare-release.outputs.source_tag }}"
-          docker pull "${BE_IMAGE}:${{ needs.prepare-release.outputs.source_tag }}"
+          docker pull "${{ env.FE_IMAGE }}:${{ needs.prepare-release.outputs.source_tag }}"
+          docker pull "${{ env.BE_IMAGE }}:${{ needs.prepare-release.outputs.source_tag }}"
 
       - name: Retag images as release
         run: |
-          docker tag "${FE_IMAGE}:${{ needs.prepare-release.outputs.source_tag }}" "${FE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}"
-          docker tag "${BE_IMAGE}:${{ needs.prepare-release.outputs.source_tag }}" "${BE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}"
+          docker tag "${{ env.FE_IMAGE }}:${{ needs.prepare-release.outputs.source_tag }}" "${FE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}"
+          docker tag "${{ env.BE_IMAGE }}:${{ needs.prepare-release.outputs.source_tag }}" "${{ env.BE_IMAGE }}:${{ needs.prepare-release.outputs.target_tag }}"
 
       - name: Push release images
         run: |
-          docker push "${FE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}"
-          docker push "${BE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}"
+          docker push "${{ env.FE_IMAGE }}:${{ needs.prepare-release.outputs.target_tag }}"
+          docker push "${{ env.BE_IMAGE }}:${{ needs.prepare-release.outputs.target_tag }}"
 
       - name: Write summary
         run: |
           echo "## Release created" >> "$GITHUB_STEP_SUMMARY"
           echo "- Source RC: \`${{ needs.prepare-release.outputs.source_tag }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Release tag: \`${{ needs.prepare-release.outputs.target_tag }}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Frontend: \`${FE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Backend: \`${BE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Frontend: \`${{ env.FE_IMAGE }}:${{ needs.prepare-release.outputs.target_tag }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Backend: \`${{ env.BE_IMAGE }}:${{ needs.prepare-release.outputs.target_tag }}\`" >> "$GITHUB_STEP_SUMMARY"
 
   create-github-release:
     name: Create GitHub release
