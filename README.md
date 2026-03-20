@@ -25,7 +25,8 @@ A kubernetes demo projec to showcase Kubernetes, containerization, and platform 
 - [x] Ingress controller
 - [x] Helm chart
 - [x] GitOps with Argo CD
-- [x] CI pipelines
+- [x] CI workflows
+- [x] CD workflows
 - [ ] Monitoring stack
 - [ ] Deploy to AKS or EKS
 - [ ] Optional: Terraform infrastructure
@@ -68,7 +69,6 @@ Stop and remove the cluster:
 
 
 ## Run with helm
-
 
 ```bash
 ./scripts/helm-up.sh
