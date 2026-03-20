@@ -2,14 +2,14 @@ backend:
   replicaCount: 1
   image:
     repository: ghcr.io/r0bes/k8s-demo-be
-    tag: "0.1.1-12"
+    tag: 0.1.3
     pullPolicy: IfNotPresent
 
 frontend:
   replicaCount: 1
   image:
     repository: ghcr.io/r0bes/k8s-demo-fe
-    tag: "0.1.1-12"
+    tag: 0.1.3
     pullPolicy: IfNotPresent
 
 ingress:
