@@ -1,0 +1,121 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_tag:
+        description: "RC tag to release, e.g. 0.1.1-rc.20"
+        required: true
+        type: string
+      create_github_release:
+        description: "Create GitHub release"
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  FE_IMAGE: ghcr.io/r0bes/k8s-demo-fe
+  BE_IMAGE: ghcr.io/r0bes/k8s-demo-be
+
+jobs:
+  prepare-release:
+    name: Prepare release metadata
+    runs-on: ubuntu-latest
+    outputs:
+      source_tag: ${{ steps.meta.outputs.source_tag }}
+      target_tag: ${{ steps.meta.outputs.target_tag }}
+
+    steps:
+      - name: Validate RC tag and determine release tag
+        id: meta
+        run: |
+          SOURCE_TAG="${{ inputs.source_tag }}"
+
+          if [[ ! "$SOURCE_TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
+            echo "Invalid RC tag: $SOURCE_TAG"
+            exit 1
+          fi
+
+          TARGET_TAG="${SOURCE_TAG%-rc.*}"
+
+          echo "source_tag=$SOURCE_TAG" >> "$GITHUB_OUTPUT"
+          echo "target_tag=$TARGET_TAG" >> "$GITHUB_OUTPUT"
+
+  release-images:
+    name: Promote RC images to release
+    runs-on: ubuntu-latest
+    needs: prepare-release
+
+    steps:
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Ensure release tag does not already exist
+        run: |
+          if docker manifest inspect "${BE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}" >/dev/null 2>&1; then
+            echo "Release tag already exists: ${{ needs.prepare-release.outputs.target_tag }}"
+            exit 1
+          fi
+
+      - name: Ensure release tag does not already exist
+        run: |
+          if docker manifest inspect "${FE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}" >/dev/null 2>&1; then
+            echo "Release tag already exists: ${{ needs.prepare-release.outputs.target_tag }}"
+            exit 1
+          fi
+
+      - name: Pull RC images
+        run: |
+          docker pull "${FE_IMAGE}:${{ needs.prepare-release.outputs.source_tag }}"
+          docker pull "${BE_IMAGE}:${{ needs.prepare-release.outputs.source_tag }}"
+
+      - name: Retag images as release
+        run: |
+          docker tag "${FE_IMAGE}:${{ needs.prepare-release.outputs.source_tag }}" "${FE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}"
+          docker tag "${BE_IMAGE}:${{ needs.prepare-release.outputs.source_tag }}" "${BE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}"
+
+      - name: Push release images
+        run: |
+          docker push "${FE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}"
+          docker push "${BE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}"
+
+      - name: Write summary
+        run: |
+          echo "## Release created" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Source RC: \`${{ needs.prepare-release.outputs.source_tag }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Release tag: \`${{ needs.prepare-release.outputs.target_tag }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Frontend: \`${FE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Backend: \`${BE_IMAGE}:${{ needs.prepare-release.outputs.target_tag }}\`" >> "$GITHUB_STEP_SUMMARY"
+
+  create-github-release:
+    name: Create GitHub release
+    if: ${{ inputs.create_github_release }}
+    runs-on: ubuntu-latest
+    needs:
+      - prepare-release
+      - release-images
+
+    steps:
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.prepare-release.outputs.target_tag }}
+          name: Release v${{ needs.prepare-release.outputs.target_tag }}
+          generate_release_notes: true
+
+  update-gitops:
+    needs:
+      - prepare-release
+      - release-images
+    uses: ./.github/workflows/gitops.yml
+    with:
+      release_tag: ${{ needs.prepare-release.outputs.target_tag }}
+    secrets: inherit

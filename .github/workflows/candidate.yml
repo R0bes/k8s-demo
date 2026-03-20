@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '**'
+      - '!ops/helm/values-prod.yaml'
 
 permissions:
   contents: read
@@ -77,7 +80,7 @@ jobs:
       - name: Create env file
         run: |
           sed -i "s|^APP_VERSION=.*|APP_VERSION=${{ needs.prepare-version.outputs.semVer }}|" .env
-          sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=${{ needs.prepare-version.outputs.majorMinorPatch }}-candidate.${{ github.run_number }}|" .env
+          sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=${{ needs.prepare-version.outputs.majorMinorPatch }}-rc.${{ github.run_number }}|" .env
           sed -i "s|^FE_IMAGE=.*|FE_IMAGE=${{ env.FE_IMAGE }}|" .env
           sed -i "s|^BE_IMAGE=.*|BE_IMAGE=${{ env.BE_IMAGE }}|" .env
 
@@ -85,4 +88,4 @@ jobs:
         run: make docker-build
 
       - name: Push candidate images
-        run: docker compose -f ./ops/compose/docker-compose.yml push
+        run: docker compose -f ./ops/compose/docker-compose.yml --env-file .env push
