@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       source_tag:
-        description: "RC tag to release, e.g. 0.1.1-rc.20"
+        description: "RC tag to release, e.g. 0.1.0-rc.1"
         required: true
         type: string
       create_github_release:
