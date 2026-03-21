@@ -23,12 +23,6 @@ jobs:
   backend-checks:
     name: Backend checks
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: app/backend
-    env:
-      UV_PROJECT_ENVIRONMENT: .venv
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
