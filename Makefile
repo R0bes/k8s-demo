@@ -1,9 +1,3 @@
-PYTHON := python3
-VENV := .venv
-VENV_PYTHON := $(VENV)/bin/python
-VENV_PIP := $(VENV)/bin/pip
-PRE_COMMIT := $(VENV)/bin/pre-commit
-
 FRONTEND_DIR := ./app/frontend
 BACKEND_DIR := ./app/backend
 
@@ -90,20 +84,13 @@ help:
 	@echo ""
 
 setup-repo:
-	@echo "Setup python venv..."
-	test -d $(VENV) || $(PYTHON) -m venv $(VENV)
-
-	@echo "Upgrade pip..."
-	$(VENV_PIP) install --upgrade pip
-
-	@echo "Install pre-commit..."
-	$(VENV_PIP) install pre-commit
-
+	@echo "Installing pre-commit..."
+	uv tool install pre-commit
 	@echo "Setup hooks..."
-	$(PRE_COMMIT) install
+	uvx pre-commit install
 
 clean:
-	rm -rf $(VENV)
+	rm -rf app/backend/.venv
 
 
 
@@ -136,10 +123,24 @@ format:
 	$(MAKE) -C $(FRONTEND_DIR) format
 	$(MAKE) -C $(BACKEND_DIR) format
 
-test:
-	$(MAKE) -C $(FRONTEND_DIR) test
+format-check:
+	$(MAKE) -C $(BACKEND_DIR) format-check
+
+test-be:
 	$(MAKE) -C $(BACKEND_DIR) test
 
+test-fe:
+	$(MAKE) -C $(FRONTEND_DIR) test
+
+test: test-be test-fe
+
+check-be:
+	$(MAKE) -C $(BACKEND_DIR) check
+
+check-fe:
+	$(MAKE) -C $(FRONTEND_DIR) check
+
+check: check-be check-fe
 
 
 

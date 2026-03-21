@@ -1,26 +1,28 @@
-ROOT_DIR := $(abspath ../..)
-PYTHON := $(ROOT_DIR)/.venv/bin/python
-RUFF := $(ROOT_DIR)/.venv/bin/ruff
-PYTEST := $(ROOT_DIR)/.venv/bin/pytest
-PIP := $(ROOT_DIR)/.venv/bin/pip
+UV := uv
 
-
-.PHONY: setup run-dev lint format test
+.PHONY: setup run-dev lint lint-fix format test chec check-fix
 
 setup:
-	$(PIP) install -r requirements-dev.txt
+	$(UV) sync --dev
 
 run-dev:
-	$(PYTHON) -m uvicorn app.main:app --reload
+	$(UV) run uvicorn app.main:app --reload
 
 lint:
-	$(RUFF) check .
+	$(UV) run ruff check .
 
 lint-fix:
-	@echo "No linting with auto fix implemented yet"
+	$(UV) run ruff check --fix .
 
 format:
-	$(RUFF) format .
+	$(UV) run ruff format .
+
+format-check:
+	$(UV) run ruff format --check .
 
 test:
-	$(PYTEST)
+	DB_URL=sqlite:///./test.db $(UV) run pytest
+
+check: lint format-check test
+
+check-fix: lint-fix format test

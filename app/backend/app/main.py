@@ -30,6 +30,7 @@ def on_startup() -> None:
 def health_check() -> dict[str, str]:
     return {"status": "ok"}
 
+
 @app.get("/version")
 def version() -> dict[str, str]:
     return {"version": APP_VERSION}
