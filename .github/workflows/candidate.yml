@@ -72,6 +72,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           ref: main
+          token: ${{ secrets.GIT_PAT }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -80,16 +81,22 @@ jobs:
         run: |
           uv version --project app/backend ${{ needs.prepare-version.outputs.majorMinorPatch }}
 
+      - name: Bump package.json version
+        run: |
+          npm version ${{ needs.prepare-version.outputs.majorMinorPatch }} --no-git-tag-version --prefix app/frontend
+
       - name: Bump Chart.yaml appVersion
         run: |
-          sed -i "s|^version:.*|version: \"${{ needs.prepare-version.outputs.majorMinorPatch }}\"|" ops/helm/Chart.yaml
+          sed -i "s|^version:.*|version: ${{ needs.prepare-version.outputs.majorMinorPatch }}|" ops/helm/Chart.yaml
           sed -i "s|^appVersion:.*|appVersion: \"${{ needs.prepare-version.outputs.majorMinorPatch }}\"|" ops/helm/Chart.yaml
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/backend/pyproject.toml ops/helm/Chart.yaml
+          git add app/backend/pyproject.toml
+          git add app/frontend/package.json
+          git add ops/helm/Chart.yaml
           if git diff --cached --quiet; then
             echo "No version changes to commit."
             exit 0
