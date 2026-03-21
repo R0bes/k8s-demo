@@ -123,9 +123,13 @@ format:
 	$(MAKE) -C $(FRONTEND_DIR) format
 	$(MAKE) -C $(BACKEND_DIR) format
 
-test:
-	$(MAKE) -C $(FRONTEND_DIR) test
+test-be:
 	$(MAKE) -C $(BACKEND_DIR) test
+
+test-fe:
+	$(MAKE) -C $(FRONTEND_DIR) test
+
+test: test-be test-fe
 
 
 
