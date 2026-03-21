@@ -9,7 +9,7 @@ on:
       - '!ops/helm/values-prod.yaml'
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 concurrency:
@@ -61,10 +61,47 @@ jobs:
           echo "semVer=${{ steps.version.outputs.semVer }}" >> "$GITHUB_OUTPUT"
           echo "majorMinorPatch=${{ steps.version.outputs.majorMinorPatch }}" >> "$GITHUB_OUTPUT"
 
+
+  bump-versions:
+    name: Bump version in source
+    runs-on: ubuntu-latest
+    needs: prepare-version
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Bump pyproject.toml version
+        run: |
+          uv version --project app/backend ${{ needs.prepare-version.outputs.majorMinorPatch }}
+
+      - name: Bump Chart.yaml appVersion
+        run: |
+          sed -i "s|^version:.*|version: \"${{ needs.prepare-version.outputs.majorMinorPatch }}\"|" ops/helm/Chart.yaml
+          sed -i "s|^appVersion:.*|appVersion: \"${{ needs.prepare-version.outputs.majorMinorPatch }}\"|" ops/helm/Chart.yaml
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/backend/pyproject.toml ops/helm/Chart.yaml
+          if git diff --cached --quiet; then
+            echo "No version changes to commit."
+            exit 0
+          fi
+          git commit -m "chore: bump version to ${{ needs.prepare-version.outputs.majorMinorPatch }} [skip ci]"
+          git push origin main
+
+
   build-and-push:
     name: Build and push candidate images
     runs-on: ubuntu-latest
-    needs: prepare-version
+    needs: [prepare-version, bump-versions]
 
     steps:
       - name: Checkout repository
@@ -79,7 +116,6 @@ jobs:
 
       - name: Create env file
         run: |
-          sed -i "s|^APP_VERSION=.*|APP_VERSION=${{ needs.prepare-version.outputs.semVer }}|" .env
           sed -i "s|^IMAGE_TAG=.*|IMAGE_TAG=${{ needs.prepare-version.outputs.majorMinorPatch }}-rc.${{ github.run_number }}|" .env
           sed -i "s|^FE_IMAGE=.*|FE_IMAGE=${{ env.FE_IMAGE }}|" .env
           sed -i "s|^BE_IMAGE=.*|BE_IMAGE=${{ env.BE_IMAGE }}|" .env

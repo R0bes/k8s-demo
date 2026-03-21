@@ -1,4 +1,7 @@
-import os
+from importlib.metadata import PackageNotFoundError, version
 
 def get_app_version() -> str:
-    return os.getenv("APP_VERSION", "0.0.0")
+    try:
+        return version("k8s-demo-backend")
+    except PackageNotFoundError:
+        return "dev"
