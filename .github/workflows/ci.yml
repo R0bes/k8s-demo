@@ -36,9 +36,7 @@ jobs:
         run: make setup-be
 
       - name: Run tests
-        env:
-          DB_URL: sqlite:///./test.db
-        run: make test
+        run: make check-be
 
   frontend-checks:
     name: Frontend checks

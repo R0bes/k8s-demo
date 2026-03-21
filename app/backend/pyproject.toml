@@ -14,7 +14,7 @@ dependencies = [
   "psycopg[binary]",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
   "pytest",
   "httpx",
