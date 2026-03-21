@@ -1,25 +1,27 @@
+UV := uv
+
 .PHONY: setup run-dev lint lint-fix format test chec check-fix
 
 setup:
-	uv sync --dev
+	$(UV) sync --dev
 
 run-dev:
-	uv run uvicorn app.main:app --reload
+	$(UV) run uvicorn app.main:app --reload
 
 lint:
-	uv run ruff check .
+	$(UV) run ruff check .
 
 lint-fix:
-	uv run ruff check --fix .
+	$(UV) run ruff check --fix .
 
 format:
-	uv run ruff format .
+	$(UV) run ruff format .
 
 format-check:
-	uv run ruff format --check .
+	$(UV) run ruff format --check .
 
 test:
-	DB_URL=sqlite:///./test.db uv run pytest
+	DB_URL=sqlite:///./test.db $(UV) run pytest
 
 check: lint format-check test
 

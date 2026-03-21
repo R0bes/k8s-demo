@@ -16,7 +16,6 @@ repos:
     rev: v0.11.2
     hooks:
       - id: ruff
-        args: [--fix]
         files: ^app/backend/.*\.py$
       - id: ruff-format
         files: ^app/backend/.*\.py$
