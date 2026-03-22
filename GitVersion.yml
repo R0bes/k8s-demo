@@ -1,3 +1,5 @@
 workflow: GitHubFlow/v1
-mode: Mainline
+strategies:
+  - ConfiguredNextVersion
+  - Mainline
 next-version: 0.1.0

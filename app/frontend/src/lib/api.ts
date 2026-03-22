@@ -37,7 +37,6 @@ export async function createTask(title: string): Promise<Task> {
   return response.json();
 }
 
-
 export async function getBackendVersion(): Promise<string> {
   const response = await fetch(`${apiUrl}/version`, {
     cache: "no-store",
