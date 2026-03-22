@@ -195,9 +195,6 @@ compose-logs:
 compose-logs-f:
 	docker compose -f $(COMPOSE_FILE) logs -f
 
-compose-wait:
-	docker compose -f $(COMPOSE_FILE) wait frontend backend
-
 
 
 ### ------------------------
