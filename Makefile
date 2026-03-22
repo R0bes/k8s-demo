@@ -100,11 +100,11 @@ clean:
 
 DEV_DB_URL ?= postgresql+psycopg://$(DB_USER):$(DB_PASSWORD)@localhost:$(DB_PORT)/$(DB_NAME)
 
-setup-be: setup-repo
+setup-be:
 	@echo "Setting up backend..."
 	$(MAKE) -C $(BACKEND_DIR) setup
 
-setup-fe: setup-repo
+setup-fe:
 	@echo "Setting up frontend..."
 	$(MAKE) -C $(FRONTEND_DIR) setup
 
