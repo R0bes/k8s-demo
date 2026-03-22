@@ -107,7 +107,7 @@ jobs:
   bump-versions:
     name: Bump version in source
     runs-on: ubuntu-latest
-    needs: [backend-checks, frontend-checks]
+    needs: [integration-smoke]
     if: github.event_name == 'pull_request' && github.base_ref == 'main'
 
     steps:
