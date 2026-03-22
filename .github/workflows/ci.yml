@@ -83,6 +83,12 @@ jobs:
       - name: Run compose stack
         run: make compose-up
 
+      - name: Log docker
+        run: docker ps
+
+      - name: Log compose
+        run: make compose-logs
+
       - name: Check frontend is up
         run: |
           curl -fsS http://localhost:3000 > /dev/null
