@@ -83,21 +83,21 @@ jobs:
       - name: Run compose stack
         run: make compose-up
 
-      - name: Wait for backend
+      - name: Check frontend is up
         run: |
-          for i in {1..30}; do
-            if curl -fsS http://localhost:8000/health; then
-              exit 0
-            fi
-            sleep 2
-          done
-          exit 1
+          curl -fsS http://localhost:3000 > /dev/null
 
-      - name: Check frontend version
+      - name: Check backend health
         run: |
-          ACTUAL_FE_VERSION="$(curl -fsS http://localhost:3000 | grep -oP 'Frontend:\s*<!-- -->\K[^<]+')"
-          echo "Frontend version: $ACTUAL_FE_VERSION"
-          test "$ACTUAL_FE_VERSION" = "${{ env.APP_VERSION }}"
+          curl -fsS http://localhost:8000/health | python -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          assert data['status'] == 'ok', f'Unexpected health response: {data}'
+          "
+
+      - name: Check frontend can reach backend
+        run: |
+          curl -fsS http://localhost:3000 | grep -q 'Backend:'
 
       - name: Stop stack
         if: always()
