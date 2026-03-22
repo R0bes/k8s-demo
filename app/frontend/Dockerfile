@@ -17,6 +17,8 @@ RUN npm run build
 
 FROM node:22-alpine AS runner
 
+ENV HOSTNAME=0.0.0.0
+
 WORKDIR /app
 
 ENV NODE_ENV=production

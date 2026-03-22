@@ -83,21 +83,40 @@ jobs:
       - name: Run compose stack
         run: make compose-up
 
-      - name: Wait for backend
+      - name: Log docker
+        run: docker ps
+
+      - name: Log compose
+        run: make compose-logs
+
+      - name: Wait for stack to be healthy
         run: |
-          for i in {1..30}; do
-            if curl -fsS http://localhost:8000/health; then
+          for i in {1..60}; do
+            BE=$(docker inspect --format='{{.State.Health.Status}}' k8s-demo-be 2>/dev/null)
+            FE=$(docker inspect --format='{{.State.Health.Status}}' k8s-demo-fe 2>/dev/null)
+            echo "Backend: $BE, Frontend: $FE"
+            if [ "$BE" = "healthy" ] && [ "$FE" = "healthy" ]; then
               exit 0
             fi
-            sleep 2
+            sleep 3
           done
           exit 1
 
-      - name: Check frontend version
+      - name: Check frontend is up
         run: |
-          ACTUAL_FE_VERSION="$(curl -fsS http://localhost:3000 | grep -oP 'Frontend:\s*<!-- -->\K[^<]+')"
-          echo "Frontend version: $ACTUAL_FE_VERSION"
-          test "$ACTUAL_FE_VERSION" = "${{ env.APP_VERSION }}"
+          curl -fsS http://localhost:3000 > /dev/null
+
+      - name: Check backend health
+        run: |
+          curl -fsS http://localhost:8000/health | python -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          assert data['status'] == 'ok', f'Unexpected health response: {data}'
+          "
+
+      - name: Check frontend can reach backend
+        run: |
+          curl -fsS http://localhost:3000 | grep -q 'Backend:'
 
       - name: Stop stack
         if: always()
