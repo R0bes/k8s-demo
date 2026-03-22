@@ -129,9 +129,6 @@ jobs:
       - name: Determine version
         id: version
         uses: gittools/actions/gitversion/execute@v4
-        with:
-          overrideConfig: |
-            branch-name=${{ github.head_ref }}
 
       - name: Bump versions
         run: |
