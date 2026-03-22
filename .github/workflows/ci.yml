@@ -83,12 +83,6 @@ jobs:
       - name: Run compose stack
         run: make compose-up
 
-      - name: Log docker
-        run: docker ps
-
-      - name: Log compose
-        run: make compose-logs
-
       - name: Wait for stack to be healthy
         run: |
           for i in {1..60}; do
@@ -101,6 +95,9 @@ jobs:
             sleep 3
           done
           exit 1
+
+      - name: Log docker
+        run: docker ps
 
       - name: Check frontend is up
         run: |
