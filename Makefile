@@ -137,10 +137,18 @@ test: test-be test-fe
 check-be:
 	$(MAKE) -C $(BACKEND_DIR) check
 
+check-fix-be:
+	$(MAKE) -C $(BACKEND_DIR) check-fix
+
 check-fe:
 	$(MAKE) -C $(FRONTEND_DIR) check
 
+check-fix-fe:
+	$(MAKE) -C $(FRONTEND_DIR) check-fix
+
 check: check-be check-fe
+
+check-fix: check-fix-be check-fix-fe
 
 
 
