@@ -89,6 +89,13 @@ jobs:
       - name: Log compose
         run: make compose-logs
 
+      - name: Wait for stack to get healthy
+        run: |
+          docker compose -f ./ops/compose/docker-compose.yml wait frontend backend
+
+      - name: Log docker
+        run: docker ps
+
       - name: Check frontend is up
         run: |
           curl -fsS http://localhost:3000 > /dev/null
