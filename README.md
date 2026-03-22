@@ -31,6 +31,7 @@ A kubernetes demo projec to showcase Kubernetes, containerization, and platform 
 - [ ] Deploy to AKS or EKS
 - [ ] Optional: Terraform infrastructure
 
+
 ## Run locally with Docker Compose
 
 ```bash
